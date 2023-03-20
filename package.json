@@ -1,0 +1,24 @@
+{
+  "name": "tpmi-redux",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "devDependencies": {
+    "open": "^8.4.2",
+    "save-pixels": "^2.3.6"
+  },
+  "scripts": {
+    "test": "node sandbox.js"
+  },
+  "author": "raikutro",
+  "license": "MIT",
+  "description": "",
+  "imports": {
+    "#tpmi/*": "./modules/*.js"
+  },
+  "dependencies": {
+    "distance-transform": "^1.0.2",
+    "ndarray": "^1.0.19",
+    "pngjs-image": "^0.11.7"
+  }
+}
