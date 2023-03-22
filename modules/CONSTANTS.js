@@ -50,14 +50,14 @@ const TILE_COLORS = [
 
 // Clockwise, starting from the top neighbor
 const NEIGHBOR_VECTORS = [
-	{x: 0, y: -1}, // 0
-	{x: 1, y: -1}, // 1
-	{x: 1, y: 0},  // 2
-	{x: 1, y: 1},  // 3
-	{x: 0, y: 1},  // 4
-	{x: -1, y: 1}, // 5
-	{x: -1, y: 0}, // 6
-	{x: -1, y: -1} // 7
+	{x: 0, y: -1}, // 0 ↑
+	{x: 1, y: -1}, // 1 ↗
+	{x: 1, y: 0},  // 2 →
+	{x: 1, y: 1},  // 3 ↘
+	{x: 0, y: 1},  // 4 ↓
+	{x: -1, y: 1}, // 5 ↙
+	{x: -1, y: 0}, // 6 ←
+	{x: -1, y: -1} // 7 ↖
 ];
 
 const SYMMETRY = {

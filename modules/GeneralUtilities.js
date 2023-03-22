@@ -1,3 +1,4 @@
+import { NEIGHBOR_VECTORS } from '#tpmi/CONSTANTS';
 import ndarray from 'ndarray';
 
 const hexToRGB = hex => {
@@ -32,9 +33,34 @@ const matrixCellScale = (matrix, [newMin, newMax]) => {
 	return newMatrix;
 };
 
+const floodFill = (origin, _settings={}) => {
+	const settings = {
+		color: (originPoint, checkPoint) => {},
+		diagonal: false,
+		..._settings
+	};
+
+	const queue = [];
+
+	queue.push(Array.from(origin));
+	while (queue.length) {
+		const [x1, y1] = queue.pop();
+
+		for (let i = 0; i < NEIGHBOR_VECTORS.length; i++) {
+			if(!settings.diagonal && i % 2 !== 0) continue;
+			const point = [x1 + NEIGHBOR_VECTORS[i].x, y1 + NEIGHBOR_VECTORS[i].y];
+			const isValid = settings.color([x1, y1], point);
+			if(isValid) queue.push(point);
+		}
+	}
+
+	return true;
+};
+
 export {
 	hexToRGB,
 	matrixMinMax,
 	matrixCellScale,
+	floodFill,
 	lerp
 };
