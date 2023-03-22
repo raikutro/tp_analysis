@@ -3,11 +3,13 @@ import * as loadMaps from '#tpmi/loadMaps';
 import * as createMasks from '#tpmi/createMasks';
 import * as visualize from '#tpmi/visualize';
 import * as transform from '#tpmi/transform';
+import ndarray from 'ndarray';
 
 export default {
-	CONSTANTS,
+	...CONSTANTS,
 	...loadMaps,
 	...createMasks,
 	...visualize,
-	...transform
+	...transform,
+	ndarray
 }

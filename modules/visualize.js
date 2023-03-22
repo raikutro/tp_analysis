@@ -1,7 +1,7 @@
 import { hexToRGB, lerp } from '#tpmi/GeneralUtilities';
 import ndarray from 'ndarray';
 
-const COLOR_PALETTE = ["5e3735","b59a66","a13d77","dc9824","885a44","b8560f","3a3a41","e68556","2c4941","208cb2","c02931","6d2047","82dcd7","2c2228","253348","7a7576","b9d850","66a650","d78b98","1d1b24","3c1c43","efcb84"];
+const COLOR_PALETTE = ["000000", "5e3735","b59a66","a13d77","dc9824","885a44","b8560f","3a3a41","e68556","2c4941","208cb2","c02931","6d2047","82dcd7","2c2228","253348","7a7576","b9d850","66a650","d78b98","1d1b24","3c1c43","efcb84"];
 
 const colorize = (matrix, colorPalette=COLOR_PALETTE) => {
 	const colors = colorPalette.map(c => hexToRGB(parseInt(c, 16)));

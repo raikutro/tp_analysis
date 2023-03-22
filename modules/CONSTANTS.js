@@ -20,7 +20,12 @@ const TILE_IDS = {
 	BLWALL: 18,
 	BRWALL: 19,
 	PORTAL: 20,
-	YELLOWFLAG: 21,
+	REDENDZONE: 21,
+	BLUEENDZONE: 22,
+	GRAVITYWELL: 23,
+	YELLOWFLAG: 24,
+	REDPORTAL: 25,
+	BLUEPORTAL: 26
 };
 
 const TILE_COLORS = [
@@ -43,9 +48,14 @@ const TILE_COLORS = [
 	{ red: 64, green: 128, blue: 80, alpha: 255 }, // Top Left 45 Wall
 	{ red: 64, green: 80, blue: 128, alpha: 255 }, // Top Right 45 Wall
 	{ red: 128, green: 112, blue: 64, alpha: 255 }, // Bottom Left 45 Wall
-	{ red: 128, green: 64, blue: 112, alpha: 255 }, // Bottom Right 45 Wall
-	{ red: 202, green: 192, blue: 0, alpha: 255 }, // Portal
-	{ red: 128, green: 128, blue: 0, alpha: 255 }, // Neutral Flag
+	{ red: 128, green: 64, blue: 112, alpha: 255 }, // Bottom Right 45 Wall,
+	{ red: 202, green: 192, blue: 0, alpha: 255}, // Portal
+	{ red: 185, green: 0, blue: 0, alpha: 255}, // Red Endzone
+	{ red: 25, green: 0, blue: 148, alpha: 255}, // Blue Endzone
+	{ red: 32, green: 32, blue: 32, alpha: 255}, // Gravity Well
+	{ red: 128, green: 128, blue: 0, alpha: 255}, // Yellow Flag
+	{ red: 204, green: 51, blue: 0, alpha: 255}, // Red Portal
+	{ red: 0, green: 102, blue: 204, alpha: 255}, // Blue Portal
 ];
 
 // Clockwise, starting from the top neighbor

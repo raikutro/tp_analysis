@@ -37,6 +37,19 @@ const mapMatrix = (_matrix, func) => {
 	return matrix;
 };
 
+const convolve2x2Matrix = (_matrix, func) => {
+	const matrix = ndarray(new Float32Array(_matrix.data), _matrix.shape);
+
+	for (let x = 0; x < matrix.shape[0]; x++) {
+		for (let y = 0; y < matrix.shape[1]; y++) {
+			const kernel = matrix.hi(x + 2, y + 2).lo(x,y);
+			if(func(kernel) === false) return matrix;
+		}
+	}
+
+	return matrix;
+};
+
 const distanceTransform = matrix => {
 	const newMatrix = ndarray(new Float32Array(matrix.data), matrix.shape);
 
@@ -60,10 +73,11 @@ const morphologicalMatrix = (matrix, _settings={}) => {
 		for (let y = 0; y < matrix.shape[1]; y++) {
 			const originColor = newMatrix.get(x, y);
 			if(originColor !== settings.vacuumLabel && originColor > 0) {
+				let label = currentLabel;
 				floodFill([x, y], {
 					color: ([ox, oy], [nx, ny]) => {
 						if(newMatrix.get(nx, ny) === originColor) {
-							newMatrix.set(nx, ny, currentLabel);
+							newMatrix.set(nx, ny, label);
 							return true;
 						}
 
@@ -76,15 +90,19 @@ const morphologicalMatrix = (matrix, _settings={}) => {
 		}
 	}
 
-	for (let i = 0; i < newMatrix.data.length; i++) newMatrix.data[i] = -newMatrix.data[i];
+	for (let i = 0; i < newMatrix.data.length; i++) newMatrix.data[i] = Math.abs(newMatrix.data[i]);
 
 	return newMatrix;
 };
 
-const voronoiMatrix = (_matrix, _settings={}) => {
+const voronoiMatrix = async (_matrix, _settings={}) => {
 	const settings = {
 		vacuumLabel: 0,
 		diagonal: false,
+		encirclementMax: {
+
+		},
+		onEncirclement: () => {},
 		..._settings
 	};
 
@@ -111,6 +129,9 @@ const voronoiMatrix = (_matrix, _settings={}) => {
 			for (let i = 0; i < NEIGHBOR_VECTORS.length; i++) {
 				if(!settings.diagonal && i % 2 !== 0) continue;
 				const point = [nodes[k][0] + NEIGHBOR_VECTORS[i].x, nodes[k][1] + NEIGHBOR_VECTORS[i].y];
+				if(point[0] >= matrix.shape[0] || point[0] < 0) continue;
+				if(point[1] >= matrix.shape[1] || point[1] < 0) continue;
+
 				if(matrix.get(point[0], point[1]) === settings.vacuumLabel) {
 					matrix.set(point[0], point[1], type);
 					newEncirclement.push(point);
@@ -123,12 +144,18 @@ const voronoiMatrix = (_matrix, _settings={}) => {
 
 	// Keep encircling every node and replace the labels with the new "edge" nodes
 	let encirclementSum = 0;
+	let encirclements = {};
+
 	do {
 		encirclementSum = 0;
 		for(const [type, nodes] of labels) {
+			if(typeof settings.encirclementMax[type] === 'number' && encirclements[type] >= settings.encirclementMax[type]) continue;
 			const newNodes = encircleNode(nodes, type);
 			labels.set(type, newNodes);
 			encirclementSum += newNodes.length;
+			if(!encirclements[type]) encirclements[type] = 0;
+			encirclements[type]++;
+			await settings.onEncirclement(matrix);
 		}
 	} while(encirclementSum > 0);
 
@@ -193,5 +220,6 @@ export {
 	floodFillMatrix,
 	overlayMatrices,
 	mapMatrix,
+	convolve2x2Matrix,
 	negateMatrix
 };

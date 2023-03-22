@@ -42,6 +42,8 @@ const floodFill = (origin, _settings={}) => {
 
 	const queue = [];
 
+	// Color the origin cell
+	settings.color(origin, origin);
 	queue.push(Array.from(origin));
 	while (queue.length) {
 		const [x1, y1] = queue.pop();
