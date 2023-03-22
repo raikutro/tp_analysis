@@ -31,18 +31,7 @@ import { pipeline } from 'stream/promises';
 	const keyElementVoronoi = await TPMI.voronoiMatrix(keyElementMorphological, {
 		encirclementMax: {
 			1: 2
-		},
-		// onEncirclement: async matrix => {
-		// 	encirclementCounter++;
-		// 	await pipeline(
-		// 		savePixels(TPMI.colorize(matrix), "png"),
-		// 		createWriteStream(new URL(`./tmp/anim/enc_${encirclementCounter}.png`, import.meta.url), {
-		// 			autoClose: true,
-		// 			flags: 'w'
-		// 		})
-		// 	);
-		// 	console.log(`count: ${encirclementCounter}`);
-		// }
+		}
 	});
 
 	const voronoiMapEdges = TPMI.ndarray(new Float32Array(keyElementVoronoi.data.length), keyElementVoronoi.shape);
