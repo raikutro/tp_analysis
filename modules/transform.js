@@ -43,7 +43,7 @@ const convolve2x2Matrix = (_matrix, func) => {
 	for (let x = 0; x < matrix.shape[0]; x++) {
 		for (let y = 0; y < matrix.shape[1]; y++) {
 			const kernel = matrix.hi(x + 2, y + 2).lo(x,y);
-			if(func(kernel) === false) return matrix;
+			if(func(kernel, [x, y]) === false) return matrix;
 		}
 	}
 
