@@ -107,7 +107,7 @@ const voronoiMatrix = async (_matrix, _settings={}) => {
 	};
 
 	const matrix = ndarray(new Float32Array(_matrix.data), _matrix.shape);
-	const labels = new Map();
+	let labels = new Map();
 
 	// Get labels
 	for (let x = 0; x < matrix.shape[0]; x++) {
@@ -119,6 +119,16 @@ const voronoiMatrix = async (_matrix, _settings={}) => {
 			}
 		}
 	}
+
+	// Sort labels by distance to center
+	const sortedLabelEntries = Array.from(labels.entries()).sort((a, b) => {
+		return (
+			Math.sqrt((b[1][0] - (matrix.shape[0] / 2)) ** 2 + (b[1][1] - (matrix.shape[1] / 2)) ** 2) -
+			Math.sqrt((a[1][0] - (matrix.shape[0] / 2)) ** 2 + (a[1][1] - (matrix.shape[1] / 2)) ** 2)
+		)
+	});
+
+	labels = new Map(sortedLabelEntries);
 
 	// draw pixels around a set of nodes with the specified type
 	// returns the newly set nodes, discards the old nodes

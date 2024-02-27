@@ -46,7 +46,34 @@ const matrixToHTML = (matrix) => {
 	return html;
 };
 
+const pointsToSVG = (points) => {
+	const groupElem = document.createElement('g');
+
+	for (let i = 0; i < points.length; i++) {
+		groupElem.innerHTML += `<circle cx="${points[i][0]}" cy="${points[i][1]}" r="5" />`;
+	}
+
+	return groupElem;
+};
+
+const wrapSVG = (svgGroups, _settings={}) => {
+	const settings = {
+		viewboxDimensions: [100, 50],
+		..._settings
+	};
+	const svgElem = document.createElement('svg');
+	svgElem.outerHTML = `<svg viewBox="0 0 ${settings.viewboxDimensions[0]} ${settings.viewboxDimensions[1]}" xmlns="http://www.w3.org/2000/svg"></svg>`;
+
+	for (let i = 0; i < svgGroups.length; i++) {
+		svgElem.append(svgElem);
+	}
+
+	return svgElem;
+};
+
 export {
 	colorize,
-	matrixToHTML
+	matrixToHTML,
+	pointsToSVG,
+	wrapSVG
 };

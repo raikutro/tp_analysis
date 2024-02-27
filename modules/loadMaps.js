@@ -3,6 +3,7 @@ import { hexToRGB } from '#tpmi/GeneralUtilities';
 
 import ndarray from 'ndarray';
 import PNGImage from 'pngjs-image';
+import fetch from 'node-fetch';
 
 const mapIDToTileMap = (mapID) => {
 	return new Promise((resolve, reject) => {
@@ -17,6 +18,11 @@ const mapIDToTileMap = (mapID) => {
 			resolve(matrix);
 		});
 	}).catch(console.log);
+};
+
+const mapIDToMapPreview = (mapID) => {
+	return fetch("https://fortunatemaps.herokuapp.com/preview/" + mapID + ".jpeg")
+		.then(r => r.arrayBuffer()).catch(console.log);
 };
 
 const fileToTileMap = (mapFilePath) => {
@@ -58,6 +64,7 @@ const imageBufferToTileMap = image => {
 
 export {
 	mapIDToTileMap,
+	mapIDToMapPreview,
 	fileToTileMap,
 	imageBufferToTileMap
 }
