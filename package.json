@@ -17,12 +17,15 @@
     "#tpmi/*": "./modules/*.js"
   },
   "dependencies": {
+    "@svgdotjs/svg.js": "^3.2.0",
     "distance-transform": "^1.0.2",
+    "graphology": "^0.25.4",
     "ndarray": "^1.0.19",
     "ndarray-convolve": "^2.0.0",
     "ndarray-pack": "^1.2.1",
     "node-fetch": "^3.3.1",
     "pngjs-image": "^0.11.7",
-    "simplify-js": "^1.2.4"
+    "simplify-js": "^1.2.4",
+    "svgdom": "^0.1.19"
   }
 }

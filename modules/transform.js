@@ -120,13 +120,16 @@ const voronoiMatrix = async (_matrix, _settings={}) => {
 		}
 	}
 
-	// Sort labels by distance to center
-	const sortedLabelEntries = Array.from(labels.entries()).sort((a, b) => {
+	const sortPointFunction = (a, b) => {
+		// return 0;
 		return (
-			Math.sqrt((b[1][0] - (matrix.shape[0] / 2)) ** 2 + (b[1][1] - (matrix.shape[1] / 2)) ** 2) -
-			Math.sqrt((a[1][0] - (matrix.shape[0] / 2)) ** 2 + (a[1][1] - (matrix.shape[1] / 2)) ** 2)
+			Math.sqrt((b[0] - (matrix.shape[0] / 2)) ** 2 + (b[1] - (matrix.shape[1] / 2)) ** 2) -
+			Math.sqrt((a[0] - (matrix.shape[0] / 2)) ** 2 + (a[1] - (matrix.shape[1] / 2)) ** 2)
 		)
-	});
+	};
+
+	// Sort labels by distance to center
+	const sortedLabelEntries = Array.from(labels.entries()).sort((a, b) => sortPointFunction(a[1], b[1]));
 
 	labels = new Map(sortedLabelEntries);
 
@@ -135,7 +138,10 @@ const voronoiMatrix = async (_matrix, _settings={}) => {
 	function encircleNode(nodes, type) {
 		let newEncirclement = [];
 
+		nodes.sort(sortPointFunction);
+
 		for (let k = 0; k < nodes.length; k++) {
+			let openNodes = [];
 			for (let i = 0; i < NEIGHBOR_VECTORS.length; i++) {
 				if(!settings.diagonal && i % 2 !== 0) continue;
 				const point = [nodes[k][0] + NEIGHBOR_VECTORS[i].x, nodes[k][1] + NEIGHBOR_VECTORS[i].y];
@@ -144,7 +150,13 @@ const voronoiMatrix = async (_matrix, _settings={}) => {
 
 				if(matrix.get(point[0], point[1]) === settings.vacuumLabel) {
 					matrix.set(point[0], point[1], type);
-					newEncirclement.push(point);
+					openNodes.push(point);
+				}
+			}
+
+			if(openNodes.length) {
+				for (let i = 0; i < openNodes.length; i++) {
+					newEncirclement.push(openNodes[i]);
 				}
 			}
 		}
