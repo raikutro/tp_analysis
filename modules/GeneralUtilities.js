@@ -37,6 +37,7 @@ const floodFill = (origin, _settings={}) => {
 	const settings = {
 		color: (originPoint, checkPoint) => {},
 		diagonal: false,
+		radius: Infinity,
 		..._settings
 	};
 
@@ -45,7 +46,8 @@ const floodFill = (origin, _settings={}) => {
 	// Color the origin cell
 	settings.color(origin, origin);
 	queue.push(Array.from(origin));
-	while (queue.length) {
+	let currentRadius = 0;
+	while (queue.length && currentRadius < settings.radius) {
 		const [x1, y1] = queue.pop();
 
 		for (let i = 0; i < NEIGHBOR_VECTORS.length; i++) {
@@ -54,6 +56,7 @@ const floodFill = (origin, _settings={}) => {
 			const isValid = settings.color([x1, y1], point);
 			if(isValid) queue.push(point);
 		}
+		currentRadius++;
 	}
 
 	return true;
