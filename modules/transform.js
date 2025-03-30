@@ -1,5 +1,5 @@
 import { matrixCellScale, floodFill } from '#tpmi/GeneralUtilities';
-import { NEIGHBOR_VECTORS } from '#tpmi/CONSTANTS';
+import { NEIGHBOR_VECTORS, NEIGHBOR_VECTORS_SYMMETRIC } from '#tpmi/CONSTANTS';
 
 import ndarray from 'ndarray';
 import pack from 'ndarray-pack';
@@ -30,12 +30,25 @@ const negateMatrix = (_matrix) => mapMatrix(_matrix, num => ~~!num);
 
 const mapMatrix = (_matrix, func) => {
 	const matrix = ndarray(new Float32Array(_matrix.data), _matrix.shape);
-
-	// flip nums
-	for (let i = 0; i < matrix.data.length; i++) matrix.data[i] = func(matrix.data[i]);
+	for (let x = 0; x < matrix.shape[0]; x++) {
+		for (let y = 0; y < matrix.shape[1]; y++) {
+			matrix.set(x, y, func(matrix.get(x, y), [x, y]));
+		}
+	}
 
 	return matrix;
 };
+
+function spliceMatrix(dest, dstX, dstY, src, transparent=-1){
+	for (let y = 0; y < src.shape[1]; y++) {
+		for (let x = 0; x < src.shape[0]; x++) {
+			let srcType = src.get(x, y);
+			if(srcType !== transparent) dest.set(dstX + x, dstY + y, srcType);
+		}
+	}
+
+	return dest;
+}
 
 const convolve2x2Matrix = (_matrix, func) => {
 	const matrix = ndarray(new Float32Array(_matrix.data), _matrix.shape);
@@ -43,6 +56,19 @@ const convolve2x2Matrix = (_matrix, func) => {
 	for (let x = 0; x < matrix.shape[0]; x++) {
 		for (let y = 0; y < matrix.shape[1]; y++) {
 			const kernel = matrix.hi(x + 2, y + 2).lo(x,y);
+			if(func(kernel, [x, y]) === false) return matrix;
+		}
+	}
+
+	return matrix;
+};
+
+const convolve3x3Matrix = (_matrix, func) => {
+	const matrix = ndarray(new Float32Array(_matrix.data), _matrix.shape);
+
+	for (let x = 0; x < matrix.shape[0]; x++) {
+		for (let y = 0; y < matrix.shape[1]; y++) {
+			const kernel = matrix.hi(x + 2, y + 2).lo(x - 1, y - 1);
 			if(func(kernel, [x, y]) === false) return matrix;
 		}
 	}
@@ -95,6 +121,20 @@ const morphologicalMatrix = (matrix, _settings={}) => {
 	return newMatrix;
 };
 
+function zigzagSequence(n) {
+	let result = [];
+	let left = 0, right = n;
+	while (left <= right) {
+		result.push(left);
+		if (left !== right) {
+			result.push(right);
+		}
+		left++;
+		right--;
+	}
+	return result;
+}
+
 const voronoiMatrix = async (_matrix, _settings={}) => {
 	const settings = {
 		vacuumLabel: 0,
@@ -109,9 +149,14 @@ const voronoiMatrix = async (_matrix, _settings={}) => {
 	const matrix = ndarray(new Float32Array(_matrix.data), _matrix.shape);
 	let labels = new Map();
 
+	let seqx = zigzagSequence(matrix.shape[0] - 1);
+	let seqy = zigzagSequence(matrix.shape[1] - 1);
+
 	// Get labels
-	for (let x = 0; x < matrix.shape[0]; x++) {
-		for (let y = 0; y < matrix.shape[1]; y++) {
+	for (let _x = 0; _x < matrix.shape[0]; _x++) {
+		let x = seqx[_x];
+		for (let _y = 0; _y < matrix.shape[1]; _y++) {
+			let y = seqy[_y];
 			const type = matrix.get(x, y);
 			if(type !== settings.vacuumLabel) {
 				if(!labels.has(type)) labels.set(type, []);
@@ -120,31 +165,23 @@ const voronoiMatrix = async (_matrix, _settings={}) => {
 		}
 	}
 
-	const sortPointFunction = (a, b) => {
-		// return 0;
-		return (
-			Math.sqrt((b[0] - (matrix.shape[0] / 2)) ** 2 + (b[1] - (matrix.shape[1] / 2)) ** 2) -
-			Math.sqrt((a[0] - (matrix.shape[0] / 2)) ** 2 + (a[1] - (matrix.shape[1] / 2)) ** 2)
-		)
-	};
-
 	// Sort labels by distance to center
-	const sortedLabelEntries = Array.from(labels.entries()).sort((a, b) => sortPointFunction(a[1], b[1]));
+	const sortedLabelEntries = Array.from(labels.entries());
 
 	labels = new Map(sortedLabelEntries);
+
+	const neighborVectorLength = NEIGHBOR_VECTORS_SYMMETRIC.length - (settings.diagonal ? 0 : 4);
 
 	// draw pixels around a set of nodes with the specified type
 	// returns the newly set nodes, discards the old nodes
 	function encircleNode(nodes, type) {
 		let newEncirclement = [];
 
-		nodes.sort(sortPointFunction);
-
 		for (let k = 0; k < nodes.length; k++) {
 			let openNodes = [];
-			for (let i = 0; i < NEIGHBOR_VECTORS.length; i++) {
-				if(!settings.diagonal && i % 2 !== 0) continue;
-				const point = [nodes[k][0] + NEIGHBOR_VECTORS[i].x, nodes[k][1] + NEIGHBOR_VECTORS[i].y];
+			for (let i = 0; i < neighborVectorLength; i++) {
+				// if(!settings.diagonal && i % 2 !== 0) continue;
+				const point = [nodes[k][0] + NEIGHBOR_VECTORS_SYMMETRIC[i].x, nodes[k][1] + NEIGHBOR_VECTORS_SYMMETRIC[i].y];
 				if(point[0] >= matrix.shape[0] || point[0] < 0) continue;
 				if(point[1] >= matrix.shape[1] || point[1] < 0) continue;
 
@@ -242,6 +279,8 @@ export {
 	floodFillMatrix,
 	overlayMatrices,
 	mapMatrix,
+	spliceMatrix,
 	convolve2x2Matrix,
+	convolve3x3Matrix,
 	negateMatrix
 };

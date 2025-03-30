@@ -4,10 +4,12 @@ import { COLOR_PALETTE } from '#tpmi/CONSTANTS';
 
 const window = createSVGWindow();
 const document = window.document;
-
 registerWindow(window, document);
 
 const createBaseDocument = (width, height) => {
+	const window = createSVGWindow();
+	const document = window.document;
+	registerWindow(window, document);
 	const baseLayer = SVG(document.documentElement).size(width, height);
 	baseLayer.rect(width, height).fill('rgba(0, 0, 0, 0.1)');
 	baseLayer.attr('viewBox', `0 0 ${width} ${height}`);
@@ -89,9 +91,20 @@ const addMatrixLayer = (base, matrix) => {
 				x: x,
 				y: y,
 				fill: `#${COLOR_PALETTE[tile % COLOR_PALETTE.length]}`,
-				opacity: 0.25
+				opacity: 0.33
 			});
 		}
+	}
+
+	base.add(layer);
+	return base;
+};
+
+const addPolygonLayer = (base, polygons) => {
+	const layer = SVG(document.createElement('g'));
+	
+	for (let i = 0; i < polygons.length; i++) {
+		layer.polygon(polygons[i].map(p => p.join(',')).join(' ')).fill('none').stroke({ color: 'black', width: 0.1 })
 	}
 
 	base.add(layer);
@@ -102,5 +115,6 @@ export {
 	createBaseDocument,
 	addMapPreviewLayer,
 	addRoutesLayer,
-	addMatrixLayer
+	addMatrixLayer,
+	addPolygonLayer
 };

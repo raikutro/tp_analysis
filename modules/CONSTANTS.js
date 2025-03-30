@@ -1,7 +1,7 @@
 const TILE_IDS = {
-	FLOOR: 0,
+	BACKGROUND: 0,
 	WALL: 1,
-	BACKGROUND: 2,
+	FLOOR: 2,
 	REDFLAG: 3,
 	BLUEFLAG: 4,
 	BOMB: 5,
@@ -29,9 +29,9 @@ const TILE_IDS = {
 };
 
 const TILE_COLORS = [
-	{ red: 212, green: 212, blue: 212, alpha: 255 }, // Floor
-	{ red: 120, green: 120, blue: 120, alpha: 255 }, // Wall
 	{ red: 0, green: 0, blue: 0, alpha: 255 }, // Background
+	{ red: 120, green: 120, blue: 120, alpha: 255 }, // Wall
+	{ red: 212, green: 212, blue: 212, alpha: 255 }, // Floor
 	{ red: 255, green: 0, blue: 0, alpha: 255 }, // Red Flag
 	{ red: 0, green: 0, blue: 255, alpha: 255 }, // Blue Flag
 	{ red: 255, green: 128, blue: 0, alpha: 255 }, // Bomb
@@ -70,6 +70,17 @@ const NEIGHBOR_VECTORS = [
 	{x: -1, y: -1} // 7 ↖
 ];
 
+const NEIGHBOR_VECTORS_SYMMETRIC = [
+	{x: 0, y: -1}, // 0 ↑
+	{x: 0, y: 1},  // 4 ↓
+	{x: -1, y: 0}, // 6 ←
+	{x: 1, y: 0},  // 2 →
+	{x: -1, y: -1}, // 7 ↖
+	{x: 1, y: 1},  // 3 ↘
+	{x: 1, y: -1}, // 1 ↗
+	{x: -1, y: 1}, // 5 ↙
+];
+
 const SYMMETRY = {
 	ASYMMETRIC: "A",
 	ROTATIONAL: "R",
@@ -101,4 +112,4 @@ const ELEMENT_TYPES = ["ISLANDS", "FLAGS", "SPIKES", "BOMBS", "BOOSTS", "POWERUP
 
 const COLOR_PALETTE = ["000000", "5e3735","b59a66","a13d77","dc9824","885a44","b8560f","3a3a41","e68556","2c4941","208cb2","c02931","6d2047","82dcd7","2c2228","253348","7a7576","b9d850","66a650","d78b98","1d1b24","3c1c43","efcb84"];
 
-export { TILE_IDS, TILE_COLORS, COLOR_PALETTE, NEIGHBOR_VECTORS, SYMMETRY, ELEMENT_TYPES, SYMMETRY_FUNCTIONS, TEAMS };
+export { TILE_IDS, TILE_COLORS, COLOR_PALETTE, NEIGHBOR_VECTORS, NEIGHBOR_VECTORS_SYMMETRIC, SYMMETRY, ELEMENT_TYPES, SYMMETRY_FUNCTIONS, TEAMS };

@@ -3,7 +3,9 @@ import ndarray from 'ndarray';
 import { COLOR_PALETTE } from '#tpmi/CONSTANTS';
 
 const colorize = (matrix, colorPalette=COLOR_PALETTE) => {
-	const colors = colorPalette.map(c => hexToRGB(parseInt(c, 16)));
+	const colors = colorPalette.map(c => {
+		return typeof c.red === "number" ? [c.red, c.green, c.blue] : hexToRGB(parseInt(c, 16));
+	});
 	const image = ndarray(new Float32Array(matrix.shape[0] * matrix.shape[1] * 3), matrix.shape.concat([3]));
 	const getColor = index => {
 		let baseIndex = index < 0 ? colorPalette.length + (Math.floor(index) % colors.length) : Math.floor(index) % colors.length;
@@ -35,7 +37,7 @@ const matrixToHTML = (matrix) => {
 	for (let y = 0; y < matrix.shape[1]; y++) {
 		html += `<tr>`;
 		for (let x = 0; x < matrix.shape[0]; x++) {
-			html += `<td>${String(matrix.get(x, y)).padStart(2, '.')}</td>`;
+			html += `<td>${String(matrix.get(x, y)).padStart(2, '0')}</td>`;
 		}
 		html += `</tr>`;
 	}
