@@ -1,5 +1,5 @@
 import { matrixCellScale, floodFill } from '#tpmi/GeneralUtilities';
-import { NEIGHBOR_VECTORS, NEIGHBOR_VECTORS_SYMMETRIC } from '#tpmi/CONSTANTS';
+import { NEIGHBOR_VECTORS, NEIGHBOR_VECTORS_SYMMETRIC, SYMMETRY_FUNCTIONS, SYMMETRIC_TILE_FUNCTIONS, TILE_IDS } from '#tpmi/CONSTANTS';
 
 import ndarray from 'ndarray';
 import pack from 'ndarray-pack';
@@ -39,11 +39,12 @@ const mapMatrix = (_matrix, func) => {
 	return matrix;
 };
 
-function spliceMatrix(dest, dstX, dstY, src, transparent=-1){
+function spliceMatrix(dest, dstX, dstY, src, transparent=-1, mapFn){
 	for (let y = 0; y < src.shape[1]; y++) {
 		for (let x = 0; x < src.shape[0]; x++) {
 			let srcType = src.get(x, y);
-			if(srcType !== transparent) dest.set(dstX + x, dstY + y, srcType);
+			let p = {x: dstX + x, y: dstY + y};
+			if(srcType !== transparent) dest.set(p.x, p.y, mapFn ? mapFn(p, dest.get(x, y), srcType) : srcType);
 		}
 	}
 
@@ -84,6 +85,36 @@ const distanceTransform = matrix => {
 
 	return cellScaled;
 };
+
+const symmetrify = (tileMap, symmetry, transparent=-1) => {
+	const newTileMap = ndarray(new Float32Array(tileMap.data), tileMap.shape);
+	const symmetryFunction = SYMMETRY_FUNCTIONS[symmetry];
+
+	let seqx = zigzagSequence(Math.round(tileMap.shape[0]) - 1);
+	let seqy = zigzagSequence(Math.round(tileMap.shape[1]) - 1);
+	// Get labels
+	for (let _x = 0; _x < seqx.length; _x++) {
+		let x = seqx[_x];
+		for (let _y = 0; _y < seqy.length; _y++) {
+			let y = seqy[_y];
+			const tile = newTileMap.get(x, y);
+			if(tile !== transparent) {
+				const mirrored = symmetryFunction({
+					width: tileMap.shape[0],
+					height: tileMap.shape[1]
+				}, {x, y});
+				for (let i = 0; i < mirrored.length; i++) {
+					const [mx, my] = mirrored[i];
+					if(mx >= 0 && mx < tileMap.shape[0] && my >= 0 && my < tileMap.shape[1]) {
+						newTileMap.set(mx, my, SYMMETRIC_TILE_FUNCTIONS[symmetry](tile));
+					}
+				}
+			}
+		}
+	}
+
+	return newTileMap;
+}
 
 const morphologicalMatrix = (matrix, _settings={}) => {
 	const settings = {
@@ -279,6 +310,7 @@ export {
 	floodFillMatrix,
 	overlayMatrices,
 	mapMatrix,
+	symmetrify,
 	spliceMatrix,
 	convolve2x2Matrix,
 	convolve3x3Matrix,

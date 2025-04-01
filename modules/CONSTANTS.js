@@ -91,16 +91,55 @@ const SYMMETRY = {
 
 // Mirror Functions return an array of elements that mirror the input element
 const SYMMETRY_FUNCTIONS = {
-	"A": ({width, height}, p) => [[NaN, NaN]],
-	"R": ({width, height}, p) => [[width - p.x, height - p.y]],
-	"H": ({width, height}, p) => [[width - p.x, p.y]],
-	"V": ({width, height}, p) => [[p.x, height - p.y]],
-	"F": ({width, height}, p) => [
+	[SYMMETRY.ASYMMETRIC]: ({width, height}, p) => [[NaN, NaN]],
+	[SYMMETRY.ROTATIONAL]: ({width, height}, p) => [[width - p.x, height - p.y]],
+	[SYMMETRY.HORIZONTAL]: ({width, height}, p) => [[width - p.x, p.y]],
+	[SYMMETRY.VERTICAL]: ({width, height}, p) => [[p.x, height - p.y]],
+	[SYMMETRY.FOURWAY]: ({width, height}, p) => [
 		[width - p.x, p.y],
 		[p.x, height - p.y],
 		[width - p.x, height - p.y]
 	]
-}
+};
+
+const TEAM_MIRRORING = {
+	[TILE_IDS.REDTEAMTILE]: TILE_IDS.BLUETEAMTILE,
+	[TILE_IDS.BLUETEAMTILE]: TILE_IDS.REDTEAMTILE,
+	[TILE_IDS.REDENDZONE]: TILE_IDS.BLUEENDZONE,
+	[TILE_IDS.BLUEENDZONE]: TILE_IDS.REDENDZONE,
+	[TILE_IDS.REDPORTAL]: TILE_IDS.BLUEPORTAL,
+	[TILE_IDS.BLUEPORTAL]: TILE_IDS.REDPORTAL,
+	[TILE_IDS.REDFLAG]: TILE_IDS.BLUEFLAG,
+	[TILE_IDS.BLUEFLAG]: TILE_IDS.REDFLAG,
+	[TILE_IDS.REDBOOST]: TILE_IDS.BLUEBOOST,
+	[TILE_IDS.BLUEBOOST]: TILE_IDS.REDBOOST
+};
+
+const SYMMETRIC_TILE_FUNCTIONS = {
+	[SYMMETRY.ASYMMETRIC]: (tile) => tile,
+	[SYMMETRY.ROTATIONAL]: (tile) => {
+		const mirrored = {
+			[TILE_IDS.TLWALL]: TILE_IDS.BRWALL,
+			[TILE_IDS.TRWALL]: TILE_IDS.BLWALL,
+			[TILE_IDS.BLWALL]: TILE_IDS.TRWALL,
+			[TILE_IDS.BRWALL]: TILE_IDS.TLWALL,
+			...TEAM_MIRRORING
+		}[tile];
+		return typeof mirrored === 'undefined' ? tile : mirrored;
+	},
+	[SYMMETRY.HORIZONTAL]: (tile) => {
+		const mirrored = {
+			[TILE_IDS.TLWALL]: TILE_IDS.TRWALL,
+			[TILE_IDS.TRWALL]: TILE_IDS.TLWALL,
+			[TILE_IDS.BLWALL]: TILE_IDS.BRWALL,
+			[TILE_IDS.BRWALL]: TILE_IDS.BLWALL,
+			...TEAM_MIRRORING
+		}[tile];
+		return typeof mirrored === 'undefined' ? tile : mirrored;
+	},
+	[SYMMETRY.VERTICAL]: (tile) => tile,
+	[SYMMETRY.FOURWAY]: (tile) => tile
+};
 
 const TEAMS = {
 	NONE: 0,
@@ -112,4 +151,4 @@ const ELEMENT_TYPES = ["ISLANDS", "FLAGS", "SPIKES", "BOMBS", "BOOSTS", "POWERUP
 
 const COLOR_PALETTE = ["000000", "5e3735","b59a66","a13d77","dc9824","885a44","b8560f","3a3a41","e68556","2c4941","208cb2","c02931","6d2047","82dcd7","2c2228","253348","7a7576","b9d850","66a650","d78b98","1d1b24","3c1c43","efcb84"];
 
-export { TILE_IDS, TILE_COLORS, COLOR_PALETTE, NEIGHBOR_VECTORS, NEIGHBOR_VECTORS_SYMMETRIC, SYMMETRY, ELEMENT_TYPES, SYMMETRY_FUNCTIONS, TEAMS };
+export { TILE_IDS, TILE_COLORS, COLOR_PALETTE, NEIGHBOR_VECTORS, NEIGHBOR_VECTORS_SYMMETRIC, SYMMETRY, ELEMENT_TYPES, SYMMETRY_FUNCTIONS, SYMMETRIC_TILE_FUNCTIONS, TEAMS };

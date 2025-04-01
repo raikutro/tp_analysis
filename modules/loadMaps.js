@@ -28,7 +28,7 @@ const mapIDToMapPreview = (mapID) => {
 const fileToTileMap = (mapFilePath) => {
 	return new Promise((resolve, reject) => {
 		PNGImage.readImage(mapFilePath, (err, image) => {
-			if(err) reject(err);
+			if(err || !image) reject(err);
 
 			let matrix = imageBufferToTileMap(image);
 
