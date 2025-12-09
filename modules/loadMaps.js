@@ -5,38 +5,40 @@ import ndarray from 'ndarray';
 import PNGImage from 'pngjs-image';
 import fetch from 'node-fetch';
 
+const BASE_MAP_URL = process.env.CHUNK_MAP_BASE_URL || process.env.CHUNK_BASE_URL || 'http://localhost';
+
 const mapIDToTileMap = (mapID) => {
 	return new Promise((resolve, reject) => {
-		let mapPNGLink = "https://fortunatemaps.herokuapp.com/png/" + mapID;
+		const mapPNGLink = `${BASE_MAP_URL.replace(/\/$/, "")}/png/${mapID}.png`;
 		PNGImage.readImage(mapPNGLink, (err, image) => {
-			if(err) reject(err);
+			if(err || !image) return reject(err || new Error('Missing image'));
 
 			let matrix = imageBufferToTileMap(image);
 
-			if(!matrix) return reject("Couldn't resolve map data.");
+			if(!matrix) return reject(new Error("Couldn't resolve map data."));
 
 			resolve(matrix);
 		});
-	}).catch(console.log);
+	});
 };
 
 const mapIDToMapPreview = (mapID) => {
-	return fetch("https://fortunatemaps.herokuapp.com/preview/" + mapID + ".jpeg")
-		.then(r => r.arrayBuffer()).catch(console.log);
+	const url = `${BASE_MAP_URL.replace(/\/$/, "")}/preview/${mapID}.jpeg`;
+	return fetch(url).then(r => r.arrayBuffer());
 };
 
 const fileToTileMap = (mapFilePath) => {
 	return new Promise((resolve, reject) => {
 		PNGImage.readImage(mapFilePath, (err, image) => {
-			if(err || !image) reject(err);
+			if(err || !image) reject(err || new Error('Missing image'));
 
 			let matrix = imageBufferToTileMap(image);
 
-			if(!matrix) return reject("Couldn't resolve map data.");
+			if(!matrix) return reject(new Error("Couldn't resolve map data."));
 
 			resolve(matrix);
 		});
-	}).catch(console.log);
+	});
 };
 
 const imageBufferToTileMap = image => {
