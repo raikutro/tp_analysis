@@ -5,7 +5,7 @@ import ndarray from 'ndarray';
 import PNGImage from 'pngjs-image';
 import fetch from 'node-fetch';
 
-const BASE_MAP_URL = process.env.CHUNK_MAP_BASE_URL || process.env.CHUNK_BASE_URL || 'http://localhost';
+const BASE_MAP_URL = process.env.CHUNK_MAP_BASE_URL || process.env.CHUNK_BASE_URL || 'https://fortunatemaps.herokuapp.com';
 
 const mapIDToTileMap = (mapID) => {
 	return new Promise((resolve, reject) => {
